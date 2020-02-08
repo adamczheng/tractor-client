@@ -168,7 +168,7 @@ def is_valid_input(self, player, response):
     return True
 
 
-from single_player.round_functions.hand_functions import Hand, SecondaryHand
+from single_player.round_functions.hand_functions import Hand
 
 
 def play_turn(self, sp_index):
@@ -218,7 +218,7 @@ def play_turn(self, sp_index):
 
         np_hand = Hand(player.get_hand(), self)
         np_playhand_list = [np_hand.hand[each_index] for each_index in np_input]
-        np_playhand = SecondaryHand(first_hand, np_playhand_list, self, cur_suit) #Should we pass in suit here?
+        np_playhand = Hand(first_hand, np_playhand_list, self, cur_suit) #Should we pass in suit here?
 
         np_playhand.check_is_legal_move()
         # Check if it's a legal move

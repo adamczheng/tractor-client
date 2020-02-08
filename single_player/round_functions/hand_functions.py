@@ -64,8 +64,6 @@ class Hand(object):
         :return:
         """
 
-
-
     def get_num_points(self):
         total = 0
         for card in self.hand:
@@ -105,23 +103,6 @@ class Hand(object):
     def count_singles_of_suit(self, suit):
         return len(self.subhand_of_suit(suit))
 
-
-class SecondaryHand(Hand):
-    def __init__(self, first_hand, cardlist, cur_round, suit):
-        self.first_hand = first_hand
-        Hand.__init__(self, cardlist, cur_round, suit)
-        self.winnable = True
-
-    def check_is_legal_response(self, our_hand):
-        """
-        We must check if we played the maximum number possible of SUIT.
-        Then, we'll check if we've played the maximum possible number of pairs in SUIT
-        Then, we'll check if we've played the maximum possible number of n-tractors in SUIT
-            -For tractors, we'll check if it has the same number of 2-tractors, 3-tractors, etc n-tractors as first_hand
-        If at any point in the process we do not return False (indicating illegal response) but do not have same number
-        of (single, pair, 2n-tractor), then we must set winnable to False meaning we can ignore seeing if our hand
-        is better than the best hand
-
-        :return:
-        """
+    def check_is_legal_move(self):
+        return True
 
