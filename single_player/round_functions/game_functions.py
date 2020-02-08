@@ -6,7 +6,7 @@ def play_round(self):
 
     # play out the turns
     # pass in trump info as a dictionary
-    info = self.play_turn(self.zhuang_jia_id)
+    hand_winner = self.play_turn(self.zhuang_jia_id)
     self.clear = True
     while len(self.players[0].get_hand()) > 0:
 
@@ -176,7 +176,6 @@ def play_turn(self, sp_index):
     def get_first_player_move(first_player):
         nonlocal biggest_player
         nonlocal biggest_hand
-        nonlocal first_hand
         self.current_player = self.players.index(first_player)
         biggest_player = first_player
         fp_input = self.get_player_input(self.current_player)
@@ -199,12 +198,10 @@ def play_turn(self, sp_index):
         '''
         if not self.is_valid_fpi(fp_playhand):
             return get_first_player_move(first_player)
-
-
         # delete cards once everything is processed
         fp_hand.del_indexes(fp_input)
         biggest_hand = fp_playhand
-        first_hand = fp_playhand
+        return fp_playhand
 
     def get_secondary_player_move(player):
         nonlocal biggest_hand
@@ -218,15 +215,20 @@ def play_turn(self, sp_index):
 
         np_hand = Hand(player.get_hand(), self)
         np_playhand_list = [np_hand.hand[each_index] for each_index in np_input]
-        np_playhand = Hand(first_hand, np_playhand_list, self, cur_suit) #Should we pass in suit here?
+        np_playhand = Hand(first_hand, np_playhand_list, self) #Should we pass in suit here?
 
         np_playhand.check_is_legal_move()
+        if np_playhand > biggest_hand:
+            biggest_hand = np_playhand
+            biggest_player = self.current_player
         # Check if it's a legal move
         "To-do: Add points to current_turn_points" \
         " Check if this hand greater than previous biggest hand, update if so"
+        np_hand.del_indexes(np_input)
+        return np_playhand
 
 
-    biggest_player = None
+    biggest_player = sp_index
     biggest_hand = None
     first_hand = None
     current_turn_points = 0
@@ -238,7 +240,7 @@ def play_turn(self, sp_index):
 
     first_player.print_hand()
 
-    get_first_player_move(first_player)
+    first_hand = get_first_player_move(first_player)
 
     self.current_player = 5
     self.client_input = ''
@@ -258,23 +260,14 @@ def play_turn(self, sp_index):
               ' Current turn points: ' + str(current_turn_points))
         cur_player.print_hand()
 
-        npi = self.get_secondary_player_move(cur_player)
+        np_hand = self.get_secondary_player_move(cur_player)
         self.current_player = 5
         self.client_input = ''
-        for index in npi['index_response']:
-            self.cards_played[cur_player_index].append(cur_player.get_hand()[index])
-        info_dict['biggest_hand'] = npi['biggest_hand']
-        info_dict['biggest_player'] = npi['biggest_player']
-        current_turn_points += npi['points']
-        self.del_indexes(self.players[cur_player_index], npi['index_response'])
+        current_turn_points += np_hand.get_num_points()
 
-    if self.is_attacker(info_dict['biggest_player']):
+    if self.is_attacker(biggest_player):
         self.attacker_points += current_turn_points
 
-    print(info_dict['biggest_player'].get_name() + ' won the hand with ' + str(npi['biggest_hand'][0]))
-
-
-    return {'trick_winner': self.players.index(info_dict['biggest_player']),
-            'num_cards': info_dict['size']}
+    return biggest_player
 
 
