@@ -250,7 +250,6 @@ def play_turn(self, sp_index):
     current_turn_points += first_hand.get_num_points()
 
     biggest_hand = first_hand
-    biggest_player = first_player
 
     for i in range(sp_index + 1, sp_index + 4):
         cur_player_index = i % 4

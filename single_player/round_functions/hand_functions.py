@@ -11,7 +11,7 @@ class Hand(object):
         self.pairs = []
         self.retrieve_pairs()
         self.tractors = {}
-        for i in range(2, 17):
+        for i in range(2, 12):
             self.tractors[i] = []
 
     def __gt__(self, other_hand):
