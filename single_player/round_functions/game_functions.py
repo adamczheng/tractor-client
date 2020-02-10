@@ -11,9 +11,8 @@ def play_round(self):
     while len(self.players[0].get_hand()) > 0:
 
         # assumes that play_turn return an info dictionary
-        trick_winner = info['trick_winner']
-        self.current_player = trick_winner
-        info = self.play_turn(trick_winner)
+        self.current_player = hand_winner
+        hand_winner = self.play_turn(hand_winner)
 
     # reveal di pai and add to attacker's points if necessary
     attacker_multiplier = 2 * info['num_cards']
@@ -35,14 +34,14 @@ def play_round(self):
     return self.attacker_points
 
 
-def deal(self):
+def deal(self, test=False):
     self.deck.shuffle()
     current_drawer = self.zhuang_jia_id
     while len(self.deck) > self.num_di_pai:
         self.players[current_drawer].draw(self.deck.pop())
         # print(self.players[current_drawer].name)
         # self.players[current_drawer].print_hand()
-        while True:
+        while not test:
             if self.liang_query(current_drawer) == 'space':
                 self.client_input = ''
                 break
@@ -59,17 +58,17 @@ def deal(self):
 
 def liang_query(self, current_drawer):
     # format is "suit cnt" or "SJo 2" or "BJo 2"
-    # print("Liang?")
+    print("Liang?")
     response = get_player_input(self, current_drawer)
     # space means skip liang
     if response == 'space':
-        # print("No liang, continuing")
+        print("No liang, continuing")
         return response
     # check for validity of the response
     if is_valid_input(self, self.players[current_drawer], response):
         response = [self.players[current_drawer].get_hand()[i] for i in response]
         if len(response) > 2 or len(response) <= 0:
-            # print("invalid response, continuing")
+            print("invalid response, continuing")
             return
         if len(response) == 1:
             if response[0].get_rank() == self.players[0].get_trump_rank() and self.trump_suit_cnt < 1:
@@ -95,6 +94,7 @@ def liang_query(self, current_drawer):
     else:
         return
 
+# TODO: add display of flipped cards
 def flip_di_pai(self):
     """
     Flips cards from di pai until the trump rank or joker is hit, and sets the trump suit accordingly
