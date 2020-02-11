@@ -15,20 +15,21 @@ def play_round(self):
         hand_winner = self.play_turn(hand_winner)
 
     # reveal di pai and add to attacker's points if necessary
-    attacker_multiplier = 2 * info['num_cards']
-    if (info['trick_winner'] == self.zhuang_jia_id) or (info['trick_winner'] == (self.zhuang_jia_id + 2) % 4):
+    attacker_multiplier = 2 * len(self.cards_played[0])
+    if (self.players.index(hand_winner) == self.zhuang_jia_id) or \
+            (self.players.index(hand_winner) == (self.zhuang_jia_id + 2) % 4):
         attacker_multiplier = 0
 
     di_pai_points = 0
-    print("Di pai: ", end='')
+    # print("Di pai: ", end='')
     for card in self.discards:
         di_pai_points += card.point_value
-        print(card, end=' ')
-    print('')
+        # print(card, end=' ')
+    # print('')
 
     if attacker_multiplier > 0:
-        print("Attackers won the last trick, adding %d * %d = %d points."
-              % (attacker_multiplier, di_pai_points, attacker_multiplier * di_pai_points))
+        # print("Attackers won the last trick, adding %d * %d = %d points."
+        #       % (attacker_multiplier, di_pai_points, attacker_multiplier * di_pai_points))
         self.attacker_points += attacker_multiplier * di_pai_points
 
     return self.attacker_points
@@ -108,6 +109,7 @@ def flip_di_pai(self):
                  'K': 13, 'A': 14}
     for card in self.deck.cards:
         print(card)
+        self.cards_played[self.zhuang_jia_id].append(card)
         if card.is_big_joker or card.is_small_joker:
             self.trump_suit = "none"
             print("The game is now WuZhu")
@@ -147,6 +149,7 @@ def choose_di_pai(self):
         self.discards.append(zhuang_jia_player.get_hand()[each_index])
     self.di_pai = True
     self.del_indexes(zhuang_jia_player, discard_indexes)
+    self.cards_played = {0: [], 1: [], 2: [], 3: []}
 
 def get_player_input(self, curr_player):
     # just player indexes, check if integers
@@ -180,16 +183,15 @@ def play_turn(self, sp_index):
         biggest_player = first_player
         fp_input = self.get_player_input(self.current_player)
 
-        # Check if input is a list of valid indexes
-        if not self.is_valid_input(first_player, fp_input):
-            return get_first_player_move(first_player)
+        while not self.is_valid_input(first_player, fp_input):
+            fp_input = self.get_player_input(self.current_player)
 
         fp_hand = Hand(first_player.get_hand(), self)
         fp_playhand_list = [fp_hand.hand[each_index] for each_index in fp_input]
         fp_playhand = Hand(fp_playhand_list, self, suit=self.get_suit(fp_playhand_list[0]))
 
         if not fp_playhand.check_is_one_suit(fp_playhand.suit):
-            return get_first_player_move(first_player)
+            return
 
 
         # FOR NOW, JUST CHECK IF PAIR OR SINGLE
@@ -197,7 +199,7 @@ def play_turn(self, sp_index):
         Change to a function of hand in context of round and player's hand eventually
         '''
         if not self.is_valid_fpi(fp_playhand):
-            return get_first_player_move(first_player)
+            return
         # delete cards once everything is processed
         fp_hand.del_indexes(fp_input)
         biggest_hand = fp_playhand
@@ -233,34 +235,42 @@ def play_turn(self, sp_index):
     first_hand = None
     current_turn_points = 0
 
-    self.cards_played = {0: [], 1: [], 2: [], 3: []}
     first_player = self.players[sp_index]
+    '''
     print("Hello " + first_player.get_name() + '. Please enter the cards you would like to play.'
                                                ' Attacker current points: ' + str(self.attacker_points))
 
     first_player.print_hand()
+    '''
 
     first_hand = get_first_player_move(first_player)
+
+    while not first_hand:
+        first_hand = get_first_player_move(first_player)
+
+    self.cards_played = {0: [], 1: [], 2: [], 3: []}
 
     self.current_player = 5
     self.client_input = ''
 
-    self.cards_played[sp_index] = first_hand
+    self.cards_played[sp_index] = first_hand.hand
 
     current_turn_points += first_hand.get_num_points()
 
     biggest_hand = first_hand
-    biggest_player = first_player
 
     for i in range(sp_index + 1, sp_index + 4):
         cur_player_index = i % 4
         cur_player = self.players[cur_player_index]
+        '''
         print("Hello " + cur_player.get_name() + '. Please enter the cards you would like to play.'
                                                  ' Attacker current points: ' + str(self.attacker_points) +
               ' Current turn points: ' + str(current_turn_points))
         cur_player.print_hand()
+        '''
 
         np_hand = self.get_secondary_player_move(cur_player)
+        self.cards_played[i] = np_hand.hand
         self.current_player = 5
         self.client_input = ''
         current_turn_points += np_hand.get_num_points()

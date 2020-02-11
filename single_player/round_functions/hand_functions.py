@@ -5,13 +5,13 @@ from single_player.round_functions.tractor_functions import Tractor
 class Hand(object):
 
     def __init__(self, cardlist, cur_round, suit='all'):
-        self.hand = cardlist
+        self.hand = sorted(self.hand, key=self.round.view_value)
         self.round = cur_round
         self.suit = suit
         self.pairs = []
         self.retrieve_pairs()
         self.tractors = {}
-        for i in range(2, 17):
+        for i in range(2, 12):
             self.tractors[i] = []
 
     def __gt__(self, other_hand):
@@ -24,9 +24,6 @@ class Hand(object):
     def __len__(self):
         return len(self.hand)
 
-    def sorted_hand(self):
-        return sorted(self.hand, key=self.round.view_value)
-
     def num_in_suit(self, suit):
         counter = 0
         for each_card in self.hand:
@@ -35,10 +32,9 @@ class Hand(object):
         return counter
 
     def retrieve_pairs(self):
-        sorted_hand = sorted(self.hand, key=self.round.view_value)
-        for i in range(len(sorted_hand)-1):
-            if sorted_hand[i] == sorted_hand[i+1]:
-                self.pairs.append(Pair(self.round, sorted_hand[i]))
+        for i in range(len(self.hand)-1):
+            if self.hand[i] == self.hand[i+1]:
+                self.pairs.append(Pair(self.round, self.hand[i]))
 
     def find_minimum_tractor(self, pair_hand, size):
         """
