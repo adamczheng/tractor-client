@@ -79,7 +79,7 @@ def view_value(self, card):
             order = {'clubs': 3, 'diamonds': 2, 'spades': 1, 'hearts': 0}
         if self.trump_suit == 'diamonds':
             order = {'diamonds': 3, 'spades': 2, 'hearts': 1, 'clubs': 0}
-        return 413 + order[card.get_suit()]
+        return 513 + order[card.get_suit()]
 
 
 

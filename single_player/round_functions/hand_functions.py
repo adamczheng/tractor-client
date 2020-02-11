@@ -4,13 +4,14 @@ from single_player.round_functions.tractor_functions import Tractor
 
 class Hand(object):
 
-    def __init__(self, cardlist, cur_round, suit='all'):
-        self.hand = sorted(self.hand, key=self.round.view_value)
+    def __init__(self, cardlist, cur_round, suit='all', first=None):
+        self.hand = sorted(cardlist, key=cur_round.view_value)
         self.round = cur_round
         self.suit = suit
         self.pairs = []
         self.retrieve_pairs()
         self.tractors = {}
+        self.first_hand = first
         for i in range(2, 12):
             self.tractors[i] = []
 
