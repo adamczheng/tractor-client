@@ -13,6 +13,14 @@ class Pair(object):
             return True
         return False
 
+    def __cmp__(self, other):
+        if self.card_value > other.card_value:
+            return 1
+        elif self.card_value == other.card_value:
+            return 0
+        else:
+            return -1
+
     def get_card(self):
         return self.card
 

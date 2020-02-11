@@ -4,7 +4,17 @@ class Tractor(object):
         self.length = length
 
     def __gt__(self, other):
-        pass
+        if self.high_card_value > other.high_card_value:
+            return True
+        return False
+
+    def __cmp__(self, other):
+        if self.high_card_value > other.high_card_value:
+            return 1
+        elif self.high_card_value == other.high_card_value:
+            return 0
+        else:
+            return -1
 
     def get_highest_value(self):
         return self.high_card_value

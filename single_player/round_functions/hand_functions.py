@@ -10,9 +10,16 @@ class Hand(object):
         self.suit = suit
         self.pairs = []
         self.retrieve_pairs()
+        self.pairs.sort()
         self.tractors = {}
+        self.retrieve_tractors()
+        self.sort_tractors()
         self.first_hand = first
-        for i in range(2, 12):
+        if first == None:
+            self.size_compare = 0
+        else:
+            self.size_compare = self.first_hand.size_compare
+        for i in range(2, 13):
             self.tractors[i] = []
 
     def __gt__(self, other_hand):
@@ -20,7 +27,24 @@ class Hand(object):
         N
         determine if hand is greater than other hand in the context of the round
         """
-        pass
+        first_suit = self.round.get_suit(self.hand[0])
+        if not self.check_is_one_suit(first_suit) or not (first_suit == self.first_hand.suit or first_suit == 'trump'):
+            return False
+        if not len(self.pairs) >= len(self.first_hand.pairs):
+            return False
+        for tractor_length in range(2, 13):
+            if not len(self.tractors[tractor_length]) >= len(self.first_hand.tractors[tractor_length]):
+                return False
+        if self.size_compare == 0:
+            if self.round.cmp_cards(self.hand[-1], other_hand.hand[-1]) > 0:
+                return True
+        elif self.size_compare == 1:
+            if self.pairs[-1] > other_hand.pairs[-1]:
+                return True
+        else:
+            if self.tractors[self.size_compare][-1] > other_hand.tractors[self.size_compare][-1]:
+                return True
+        return False
 
     def __len__(self):
         return len(self.hand)
@@ -46,7 +70,7 @@ class Hand(object):
         """
         pair_indexes = [i.card_value for i in pair_hand]
 
-    def retrieve_tractors(self, pair_hand, size):
+    def retrieve_tractors(self):
         """
         We start off by remembering our original self.hand using the copy method
         The algorithm detects the lowest tractor of size SIZE and appends it to our tractor list.
@@ -60,6 +84,23 @@ class Hand(object):
         :param size: a size n tractor contains 2n cards
         :return:
         """
+        pair_values = [i.card_value for i in self.pairs]
+        for i in range(2, 13):
+            current_index = i-1
+            while current_index < len(pair_values):
+                is_tractor = True
+                for j in range(current_index, current_index - i, -1):
+                    if pair_values[j] != pair_values[j-1] + 1:
+                        current_index += 1
+                        is_tractor = False
+                        break
+                if is_tractor:
+                    self.tractors[i].append(Tractor(pair_values[current_index], i))
+                    current_index += i
+
+    def sort_tractors(self):
+        for length in range(2, 13):
+            self.tractors[length].sort()
 
     def get_num_points(self):
         total = 0
