@@ -158,7 +158,7 @@ def get_player_input(self, curr_player):
     # just player indexes, check if integers
     self.current_player = curr_player
     response = self.client_input
-    if len(response) == 1 and response[0] == 'space':
+    if response == ['space']:
         return 'space'
 
     integer_list = [int(s) for s in response if s.isdigit()]
@@ -190,6 +190,7 @@ def play_turn(self, sp_index):
 
         while not self.is_valid_input(first_player, fp_input):
             fp_input = self.get_player_input(self.current_player)
+        print(fp_input)
 
         fp_playhand_list = [first_player.get_hand()[each_index] for each_index in fp_input]
         fp_playhand = Hand(fp_playhand_list, self, suit=self.get_suit(fp_playhand_list[0]))
@@ -201,8 +202,6 @@ def play_turn(self, sp_index):
         '''
         Change to a function of hand in context of round and player's hand eventually
         '''
-        if not self.is_valid_fpi(fp_playhand):
-            return
         # delete cards once everything is processed
         self.del_indexes(first_player, fp_input)
         biggest_hand = fp_playhand
@@ -215,8 +214,9 @@ def play_turn(self, sp_index):
         cur_suit = first_hand.suit
         # print("Current suit: " + cur_suit + ", current hand size: " + len(first_hand))
         np_input = self.get_player_input(self.current_player)
-        if not self.is_valid_input(player, np_input) or not len(first_hand) == len(np_input):
+        while not self.is_valid_input(player, np_input) or not len(first_hand) == len(np_input):
             np_input = self.get_player_input(self.current_player)
+        print(np_input)
 
         np_playhand_list = [player.get_hand()[each_index] for each_index in np_input]
         np_playhand = Hand(np_playhand_list, self, first=first_hand) #Should we pass in suit here?

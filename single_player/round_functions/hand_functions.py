@@ -6,21 +6,28 @@ class Hand(object):
 
     def __init__(self, cardlist, cur_round, suit='all', first=None):
         self.hand = sorted(cardlist, key=cur_round.view_value)
+        print(self.hand)
         self.round = cur_round
         self.suit = suit
         self.pairs = []
         self.retrieve_pairs()
         self.pairs.sort()
         self.tractors = {}
+        for i in range(2, 13):
+            self.tractors[i] = []
         self.retrieve_tractors()
         self.sort_tractors()
         self.first_hand = first
         if first == None:
             self.size_compare = 0
+            if len(self.pairs) > 0:
+                self.size_compare = 1
+            for i in range(12, 1, -1):
+                if len(self.tractors[i]) > 0:
+                    self.size_compare = i
+                    break
         else:
             self.size_compare = self.first_hand.size_compare
-        for i in range(2, 13):
-            self.tractors[i] = []
 
     def __gt__(self, other_hand):
         """
