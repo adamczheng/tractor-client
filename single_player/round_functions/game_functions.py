@@ -169,7 +169,7 @@ def is_valid_input(self, player, response):
     if len(set(response)) != len(response):
         return False
     if len(response) == 0:
-        return False;
+        return False
     for each_index in response:
         if int(each_index) < 0 or int(each_index) >= len(player.get_hand()):
             return False
@@ -182,10 +182,9 @@ from single_player.round_functions.hand_functions import Hand
 def play_turn(self, sp_index):
 
     def get_first_player_move(first_player):
-        nonlocal biggest_player
-        nonlocal biggest_hand
+        nonlocal turn_players
+        nonlocal turn_hands
         self.current_player = self.players.index(first_player)
-        biggest_player = self.current_player
         fp_input = self.get_player_input(self.current_player)
 
         while not self.is_valid_input(first_player, fp_input):
@@ -198,18 +197,16 @@ def play_turn(self, sp_index):
         if not fp_playhand.check_is_one_suit(fp_playhand.suit):
             return
 
-        # FOR NOW, JUST CHECK IF PAIR OR SINGLE
         '''
         Change to a function of hand in context of round and player's hand eventually
         '''
         # delete cards once everything is processed
         self.del_indexes(first_player, fp_input)
-        biggest_hand = fp_playhand
         return fp_playhand
 
     def get_secondary_player_move(player):
-        nonlocal biggest_hand
-        nonlocal biggest_player
+        nonlocal turn_hands
+        nonlocal turn_players
         self.current_player = self.players.index(player)
         cur_suit = first_hand.suit
         # print("Current suit: " + cur_suit + ", current hand size: " + len(first_hand))
@@ -219,21 +216,29 @@ def play_turn(self, sp_index):
         print(np_input)
 
         np_playhand_list = [player.get_hand()[each_index] for each_index in np_input]
-        np_playhand = Hand(np_playhand_list, self, first=first_hand) #Should we pass in suit here?
+        np_playhand = Hand(np_playhand_list, self, first=first_hand)  # Should we pass in suit here?
 
         np_playhand.check_is_legal_move()
-        if np_playhand > biggest_hand:
-            biggest_hand = np_playhand
-            biggest_player = self.current_player
         # Check if it's a legal move
         "To-do: Add points to current_turn_points" \
-        " Check if this hand greater than previous biggest hand, update if so"
+            "Check if this hand greater than previous biggest hand, update if so"
         self.del_indexes(player, np_input)
         return np_playhand
 
+    def reverse(player_index):
+        nonlocal cur_player_index
+        nonlocal cur_player
+        nonlocal current_turn_points
+        print('REVERSI!!')
+        current_turn_points -= turn_hands.pop().get_num_points()
+        self.cards_played[player_index] = []
+        cur_player_index = cur_player_index % 4
+        cur_player = self.players[cur_player_index]
+        self.set_take_back(False)
+        return
 
-    biggest_player = sp_index
-    biggest_hand = None
+    turn_players = [(sp_index + i) % 4 for i in range(4)]
+    turn_hands = []
     first_hand = None
     current_turn_points = 0
 
@@ -249,6 +254,7 @@ def play_turn(self, sp_index):
 
     while not first_hand:
         first_hand = get_first_player_move(first_player)
+    turn_hands.append(first_hand)
 
     self.cards_played = {0: [], 1: [], 2: [], 3: []}
 
@@ -259,10 +265,9 @@ def play_turn(self, sp_index):
 
     current_turn_points += first_hand.get_num_points()
 
-    biggest_hand = first_hand
-
-    for i in range(sp_index + 1, sp_index + 4):
-        cur_player_index = i % 4
+    cur_player_index = sp_index + 1
+    while len(turn_hands) < 4:
+        cur_player_index = cur_player_index % 4
         cur_player = self.players[cur_player_index]
         '''
         print("Hello " + cur_player.get_name() + '. Please enter the cards you would like to play.'
@@ -273,12 +278,22 @@ def play_turn(self, sp_index):
 
         np_hand = get_secondary_player_move(cur_player)
         while not np_hand:
+            if self.take_back:
+                return reverse(self.current_player - 1)
             np_hand = get_secondary_player_move(cur_player)
+        turn_hands.append(np_hand)
 
-        self.cards_played[i] = np_hand.hand
+        self.cards_played[cur_player_index] = np_hand.hand
         self.current_player = 5
         self.client_input = ''
         current_turn_points += np_hand.get_num_points()
+        cur_player_index += 1
+
+    biggest_index = sp_index
+    for i in range(4):
+        if turn_hands[i] > turn_hands[biggest_index]:
+            biggest_index = i
+    biggest_player = turn_players[biggest_index]
 
     if self.is_attacker(self.players[biggest_player]):
         self.attacker_points += current_turn_points

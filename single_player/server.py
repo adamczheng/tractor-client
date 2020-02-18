@@ -53,6 +53,12 @@ def threaded_client(conn):
                 response = [s.strip() for s in response.split(',') if s != '']
                 r.set_client_input(response)
                 # print(response)
+            elif currentId == (curr_player - 1) % 4 and curr_player != 5:
+                response = reply.strip('[').strip(']')
+                response = [s.strip() for s in response.split(',') if s != '']
+                if response == ['b']:
+                    print('take back set')
+                    r.set_take_back(True)
             if not data:
                 conn.send(str.encode("Goodbye"))
                 break

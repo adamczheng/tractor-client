@@ -58,6 +58,7 @@ class Round(object):
         self.di_pai = False
         self.game_start = False
         self.client_input = ''
+        self.take_back = False
         # assumes there is a zhuang jia
         print("Round starting: " + players[self.zhuang_jia_id].get_name()
               + " is zhuang jia and the trump rank is " + self.trump_rank)
@@ -340,6 +341,9 @@ class Round(object):
 
     def set_client_input(self, input):
         self.client_input = input
+
+    def set_take_back(self, input):
+        self.take_back = input
 
     def get_attacker_points(self):
         return self.attacker_points

@@ -255,6 +255,9 @@ class TractorClient():
             if position == 32:
                 print('space')
                 return self.net.send('space')
+            if position == 98:
+                print('b')
+                return self.net.send('b')
             return reply
         player_hand = self.data[self.playerID * 3 + 1]
         left_offset = (22 * (len(player_hand) - 1) + 100) / 2
