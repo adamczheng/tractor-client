@@ -280,7 +280,7 @@ def play_turn(self, sp_index):
         self.client_input = ''
         current_turn_points += np_hand.get_num_points()
 
-    if self.is_attacker(biggest_player):
+    if self.is_attacker(self.players[biggest_player]):
         self.attacker_points += current_turn_points
 
     return biggest_player
