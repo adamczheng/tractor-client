@@ -98,7 +98,6 @@ def liang_query(self, current_drawer):
     else:
         return
 
-# TODO: add display of flipped cards
 def flip_di_pai(self):
     """
     Flips cards from di pai until the trump rank or joker is hit, and sets the trump suit accordingly
@@ -212,6 +211,8 @@ def play_turn(self, sp_index):
         # print("Current suit: " + cur_suit + ", current hand size: " + len(first_hand))
         np_input = self.get_player_input(self.current_player)
         while not self.is_valid_input(player, np_input) or not len(first_hand) == len(np_input):
+            if self.take_back:
+                return reverse(turn_players[len(turn_hands) - 1])
             np_input = self.get_player_input(self.current_player)
         print(np_input)
 
@@ -225,15 +226,14 @@ def play_turn(self, sp_index):
         self.del_indexes(player, np_input)
         return np_playhand
 
-    def reverse(player_index):
-        nonlocal cur_player_index
-        nonlocal cur_player
+    def reverse(last_player):
         nonlocal current_turn_points
         print('REVERSI!!')
-        current_turn_points -= turn_hands.pop().get_num_points()
-        self.cards_played[player_index] = []
-        cur_player_index = cur_player_index % 4
-        cur_player = self.players[cur_player_index]
+        last_hand = turn_hands.pop()
+        self.players[last_player].hand.extend(last_hand.hand)
+        self.players[last_player].hand.sort(key=self.view_value, reverse=True)
+        current_turn_points -= last_hand.get_num_points()
+        self.cards_played[last_player] = []
         self.set_take_back(False)
         return
 
@@ -250,44 +250,35 @@ def play_turn(self, sp_index):
     first_player.print_hand()
     '''
 
-    first_hand = get_first_player_move(first_player)
-
-    while not first_hand:
-        first_hand = get_first_player_move(first_player)
-    turn_hands.append(first_hand)
-
     self.cards_played = {0: [], 1: [], 2: [], 3: []}
 
-    self.current_player = 5
-    self.client_input = ''
-
-    self.cards_played[sp_index] = first_hand.hand
-
-    current_turn_points += first_hand.get_num_points()
-
-    cur_player_index = sp_index + 1
     while len(turn_hands) < 4:
-        cur_player_index = cur_player_index % 4
+
+        cur_player_index = turn_players[len(turn_hands)]
+        self.current_player = cur_player_index
         cur_player = self.players[cur_player_index]
-        '''
-        print("Hello " + cur_player.get_name() + '. Please enter the cards you would like to play.'
-                                                 ' Attacker current points: ' + str(self.attacker_points) +
-              ' Current turn points: ' + str(current_turn_points))
-        cur_player.print_hand()
-        '''
 
-        np_hand = get_secondary_player_move(cur_player)
-        while not np_hand:
-            if self.take_back:
-                return reverse(self.current_player - 1)
+        if len(turn_hands) == 0:
+            first_hand = get_first_player_move(first_player)
+            while not first_hand:
+                first_hand = get_first_player_move(first_player)
+            turn_hands.append(first_hand)
+            self.cards_played[sp_index] = first_hand.hand
+            current_turn_points += first_hand.get_num_points()
+        elif self.take_back:
+            reverse(turn_players[len(turn_hands) - 1])
+        else:
             np_hand = get_secondary_player_move(cur_player)
-        turn_hands.append(np_hand)
+            if not np_hand:
+                self.current_player = 5
+                self.client_input = ''
+                continue
+            turn_hands.append(np_hand)
+            self.cards_played[cur_player_index] = np_hand.hand
+            current_turn_points += np_hand.get_num_points()
 
-        self.cards_played[cur_player_index] = np_hand.hand
         self.current_player = 5
         self.client_input = ''
-        current_turn_points += np_hand.get_num_points()
-        cur_player_index += 1
 
     biggest_index = sp_index
     for i in range(4):
