@@ -19,6 +19,7 @@ class Hand(object):
         self.sort_tractors()
         self.first_hand = first
         if first == None:
+            self.first_hand = self
             self.size_compare = 0
             if len(self.pairs) > 0:
                 self.size_compare = 1

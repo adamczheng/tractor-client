@@ -250,8 +250,6 @@ def play_turn(self, sp_index):
     first_player.print_hand()
     '''
 
-    self.cards_played = {0: [], 1: [], 2: [], 3: []}
-
     while len(turn_hands) < 4:
 
         cur_player_index = turn_players[len(turn_hands)]
@@ -263,6 +261,7 @@ def play_turn(self, sp_index):
             while not first_hand:
                 first_hand = get_first_player_move(first_player)
             turn_hands.append(first_hand)
+            self.cards_played = {0: [], 1: [], 2: [], 3: []}
             self.cards_played[sp_index] = first_hand.hand
             current_turn_points += first_hand.get_num_points()
         elif self.take_back:
