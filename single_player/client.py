@@ -57,7 +57,7 @@ class TractorClient():
         if test:
             self.playerID = 0
         else:
-            self.net = Network(True)
+            self.net = Network(False)
             self.playerID = int(self.net.getID())
             pygame.display.set_caption("Client " + str(self.playerID))
         self.data = None
