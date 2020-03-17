@@ -54,6 +54,7 @@ class Round(object):
         self.attacker_points = 0
         self.current_player = 5
         self.cards_played = {0: [], 1: [], 2: [], 3: []}
+        self.hand_stack = []
         self.clear = False
         self.di_pai = False
         self.game_start = False

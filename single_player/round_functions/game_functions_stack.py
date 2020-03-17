@@ -289,5 +289,3 @@ def play_turn(self, sp_index):
         self.attacker_points += current_turn_points
 
     return biggest_player
-
-
