@@ -12,7 +12,8 @@ dealing, compare cards, and playing
 from typing import Dict, Any
 
 from single_player.deck import *
-from single_player.round_functions import game_functions, outdated_functions, rank_functions, pair_functions
+from single_player.round_functions import outdated_functions, rank_functions, pair_functions
+from single_player.round_functions import game_functions_stack as game_functions
 from single_player.round_functions.pair_functions import Pair
 from single_player.round_functions.tractor_functions import Tractor
 
@@ -58,6 +59,8 @@ class Round(object):
         self.clear = False
         self.di_pai = False
         self.game_start = False
+        self.turn_points = 0
+        self.round_over = False
         self.client_input = ''
         self.take_back = False
         # assumes there is a zhuang jia
@@ -69,6 +72,15 @@ class Round(object):
 
     def get_deck(self):
         return self.deck
+
+    def get_first_player_move(self, first_player):
+        return game_functions.get_first_player_move(self, first_player)
+
+    def get_secondary_player_move(self, player, first_hand):
+        return game_functions.get_secondary_player_move(self, player, first_hand)
+
+    def reverse(self):
+        return game_functions.reverse(self)
 
     def play_round(self):
         """
@@ -344,7 +356,10 @@ class Round(object):
         self.client_input = input
 
     def set_take_back(self, input):
-        self.take_back = input
+        if len(self.hand_stack) != 0:
+            self.take_back = input
+        else:
+            self.take_back = False
 
     def get_attacker_points(self):
         return self.attacker_points
