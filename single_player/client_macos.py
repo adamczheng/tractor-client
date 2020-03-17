@@ -57,7 +57,7 @@ class TractorClient():
         if test:
             self.playerID = 0
         else:
-            self.net = Network()
+            self.net = Network(False)
             self.playerID = int(self.net.getID())
             pygame.display.set_caption("Client " + str(self.playerID))
         self.data = None
@@ -255,6 +255,9 @@ class TractorClient():
             if position == 32:
                 print('space')
                 return self.net.send('space')
+            if position == 98:
+                print('b')
+                return self.net.send('b')
             return reply
         player_hand = self.data[self.playerID * 3 + 1]
         left_offset = (22 * (len(player_hand) - 1) + 100) / 2
@@ -283,20 +286,20 @@ class TractorClient():
             return self.data
         data = [0, None, None, 1, None, None, 2, None, None, 3, None, None, None, None, None, None, None, None]
         split_data = response.split(':')
-        data[1] = self.make_list(split_data[1])
-        data[2] = self.make_list(split_data[2])
-        data[4] = self.make_list(split_data[4])
-        data[5] = self.make_list(split_data[5])
-        data[7] = self.make_list(split_data[7])
-        data[8] = self.make_list(split_data[8])
-        data[10] = self.make_list(split_data[10])
-        data[11] = self.make_list(split_data[11])
-        data[12] = str(split_data[12])
-        data[13] = str(split_data[13])
-        data[14] = str(split_data[14])
-        data[15] = str(split_data[15])
-        data[16] = str(split_data[16])
-        data[17] = str(split_data[17])
+        data[1] = self.make_list(split_data[1]) # player 0 hand list
+        data[2] = self.make_list(split_data[2]) # player 0 played list
+        data[4] = self.make_list(split_data[4]) # 1 hand
+        data[5] = self.make_list(split_data[5]) # 1 played
+        data[7] = self.make_list(split_data[7]) # 2 hand
+        data[8] = self.make_list(split_data[8]) # 2 played
+        data[10] = self.make_list(split_data[10]) # 3 hand
+        data[11] = self.make_list(split_data[11]) # 3 played
+        data[12] = str(split_data[12]) # clear boolean
+        data[13] = str(split_data[13]) # di pai boolean
+        data[14] = str(split_data[14]) # game start boolean
+        data[15] = str(split_data[15]) # attacker points int
+        data[16] = str(split_data[16]) # trump suit str
+        data[17] = str(split_data[17]) # current player int
         return data
 
     def make_list(self, list_in):
