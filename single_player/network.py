@@ -9,7 +9,7 @@ class Network:
         # machine running the server You can find this address by typing ipconfig in CMD and copying the ipv4
         # address. Again this must be the servers ipv4 address. This field will be the same for all your clients.
         port_in = 0
-        while not test:
+        if not test:
             port_in = input("Port number? ")
             try:
                 port_in = int(port_in)
