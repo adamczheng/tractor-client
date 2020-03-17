@@ -20,11 +20,13 @@ def play_round(self):
         if self.take_back:
             self.reverse()
         elif len(self.hand_stack) % 4 == 0:
-            first_hand = self.get_first_player_move(cur_player)
-            if not first_hand:
+            temp_hand = self.get_first_player_move(cur_player)
+            if not temp_hand:
                 self.client_input = ''
                 continue
-            if len(self.hand_stack) > 0 and self.is_attacker(self.players[self.hand_stack[-2][0]]):
+            else:
+                first_hand = temp_hand
+            if len(self.hand_stack) > 0 and self.is_attacker(self.players[self.current_player]):
                 self.attacker_points += self.turn_points
             self.turn_points = 0
             self.hand_stack.append((self.current_player, first_hand))
@@ -43,8 +45,8 @@ def play_round(self):
             if len(self.hand_stack) % 4 == 0:
                 biggest_index = -1
                 for i in range(2, 5):
-                    if self.hand_stack[-i] > self.hand_stack[biggest_index]:
-                        biggest_index = i
+                    if self.hand_stack[-i][1] > self.hand_stack[biggest_index][1]:
+                        biggest_index = -i
                 self.current_player = self.hand_stack[biggest_index][0]
                 if len(self.players[0].hand) == 0:
                     self.round_over = True
@@ -227,7 +229,7 @@ def get_first_player_move(self, first_player):
         return playhand.check_is_one_suit(playhand.suit)
 
     fp_input = self.get_player_input(self.current_player)
-    print(fp_input)
+    # print(fp_input)
 
     while not self.is_valid_input(first_player, fp_input) or not one_suit_helper(fp_input):
         if self.take_back:
@@ -271,13 +273,14 @@ def get_secondary_player_move(self, player, first_hand):
 # Reverses game by 1 move by updating hand_stack
 def reverse(self):
     try:
-        last_player = self.hand_stack[-2][0]
+        last_player = self.hand_stack[-1][0]
         print('REVERSE')
-        last_hand = self.hand_stack.pop()
+        last_hand = self.hand_stack.pop()[1]
         self.players[last_player].hand.extend(last_hand.hand)
         self.players[last_player].hand.sort(key=self.view_value, reverse=True)
         self.turn_points -= last_hand.get_num_points()
         self.cards_played[last_player] = []
+        self.current_player = last_player
     except IndexError:
         pass
     self.set_take_back(False)

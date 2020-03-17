@@ -6,7 +6,7 @@ class Hand(object):
 
     def __init__(self, cardlist, cur_round, suit='all', first=None):
         self.hand = sorted(cardlist, key=cur_round.view_value)
-        print(self.hand)
+        # print(self.hand)
         self.round = cur_round
         self.suit = suit
         self.pairs = []

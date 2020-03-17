@@ -73,6 +73,11 @@ class Round(object):
     def get_deck(self):
         return self.deck
 
+    def get_last_player(self):
+        if len(self.hand_stack) > 0:
+            return self.hand_stack[-1][0]
+        return 5
+
     def get_first_player_move(self, first_player):
         return game_functions.get_first_player_move(self, first_player)
 
