@@ -43,8 +43,8 @@ def play_round(self):
             self.cards_played[self.current_player] = np_hand.hand
             self.turn_points += np_hand.get_num_points()
             if len(self.hand_stack) % 4 == 0:
-                biggest_index = -1
-                for i in range(2, 5):
+                biggest_index = -4
+                for i in range(3, 0, -1):
                     if self.hand_stack[-i][1] > self.hand_stack[biggest_index][1]:
                         biggest_index = -i
                 self.current_player = self.hand_stack[biggest_index][0]
