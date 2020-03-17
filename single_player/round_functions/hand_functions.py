@@ -4,28 +4,58 @@ from single_player.round_functions.tractor_functions import Tractor
 
 class Hand(object):
 
-    def __init__(self, cardlist, cur_round, suit='all'):
-        self.hand = cardlist
+    def __init__(self, cardlist, cur_round, suit='all', first=None):
+        self.hand = sorted(cardlist, key=cur_round.view_value)
+        # print(self.hand)
         self.round = cur_round
         self.suit = suit
         self.pairs = []
         self.retrieve_pairs()
+        self.pairs.sort()
         self.tractors = {}
-        for i in range(2, 17):
+        for i in range(2, 13):
             self.tractors[i] = []
+        self.retrieve_tractors()
+        self.sort_tractors()
+        self.first_hand = first
+        if first == None:
+            self.first_hand = self
+            self.size_compare = 0
+            if len(self.pairs) > 0:
+                self.size_compare = 1
+            for i in range(12, 1, -1):
+                if len(self.tractors[i]) > 0:
+                    self.size_compare = i
+                    break
+        else:
+            self.size_compare = self.first_hand.size_compare
 
     def __gt__(self, other_hand):
         """
         N
         determine if hand is greater than other hand in the context of the round
         """
-        pass
+        first_suit = self.round.get_suit(self.hand[0])
+        if not self.check_is_one_suit(first_suit) or not (first_suit == self.first_hand.suit or first_suit == 'trump'):
+            return False
+        if not len(self.pairs) >= len(self.first_hand.pairs):
+            return False
+        for tractor_length in range(2, 13):
+            if not len(self.tractors[tractor_length]) >= len(self.first_hand.tractors[tractor_length]):
+                return False
+        if self.size_compare == 0:
+            if self.round.cmp_cards(self.hand[-1], other_hand.hand[-1]) > 0:
+                return True
+        elif self.size_compare == 1:
+            if self.pairs[-1] > other_hand.pairs[-1]:
+                return True
+        else:
+            if self.tractors[self.size_compare][-1] > other_hand.tractors[self.size_compare][-1]:
+                return True
+        return False
 
     def __len__(self):
         return len(self.hand)
-
-    def sorted_hand(self):
-        return sorted(self.hand, key=self.round.view_value)
 
     def num_in_suit(self, suit):
         counter = 0
@@ -35,10 +65,9 @@ class Hand(object):
         return counter
 
     def retrieve_pairs(self):
-        sorted_hand = sorted(self.hand, key=self.round.view_value)
-        for i in range(len(sorted_hand)-1):
-            if sorted_hand[i] == sorted_hand[i+1]:
-                self.pairs.append(Pair(self.round, sorted_hand[i]))
+        for i in range(len(self.hand)-1):
+            if self.hand[i] == self.hand[i+1]:
+                self.pairs.append(Pair(self.round, self.hand[i]))
 
     def find_minimum_tractor(self, pair_hand, size):
         """
@@ -49,7 +78,7 @@ class Hand(object):
         """
         pair_indexes = [i.card_value for i in pair_hand]
 
-    def retrieve_tractors(self, pair_hand, size):
+    def retrieve_tractors(self):
         """
         We start off by remembering our original self.hand using the copy method
         The algorithm detects the lowest tractor of size SIZE and appends it to our tractor list.
@@ -63,8 +92,23 @@ class Hand(object):
         :param size: a size n tractor contains 2n cards
         :return:
         """
+        pair_values = [i.card_value for i in self.pairs]
+        for i in range(2, 13):
+            current_index = i-1
+            while current_index < len(pair_values):
+                is_tractor = True
+                for j in range(current_index, current_index - i, -1):
+                    if pair_values[j] != pair_values[j-1] + 1:
+                        current_index += 1
+                        is_tractor = False
+                        break
+                if is_tractor:
+                    self.tractors[i].append(Tractor(pair_values[current_index], i))
+                    current_index += i
 
-
+    def sort_tractors(self):
+        for length in range(2, 13):
+            self.tractors[length].sort()
 
     def get_num_points(self):
         total = 0
@@ -105,23 +149,6 @@ class Hand(object):
     def count_singles_of_suit(self, suit):
         return len(self.subhand_of_suit(suit))
 
-
-class SecondaryHand(Hand):
-    def __init__(self, first_hand, cardlist, cur_round, suit):
-        self.first_hand = first_hand
-        Hand.__init__(self, cardlist, cur_round, suit)
-        self.winnable = True
-
-    def check_is_legal_response(self, our_hand):
-        """
-        We must check if we played the maximum number possible of SUIT.
-        Then, we'll check if we've played the maximum possible number of pairs in SUIT
-        Then, we'll check if we've played the maximum possible number of n-tractors in SUIT
-            -For tractors, we'll check if it has the same number of 2-tractors, 3-tractors, etc n-tractors as first_hand
-        If at any point in the process we do not return False (indicating illegal response) but do not have same number
-        of (single, pair, 2n-tractor), then we must set winnable to False meaning we can ignore seeing if our hand
-        is better than the best hand
-
-        :return:
-        """
+    def check_is_legal_move(self):
+        return True
 
