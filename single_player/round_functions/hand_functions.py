@@ -8,7 +8,6 @@ class Hand(object):
         self.hand = sorted(cardlist, key=cur_round.view_value)
         # print(self.hand)
         self.round = cur_round
-        self.suit = suit
         self.pairs = []
         self.retrieve_pairs()
         self.pairs.sort()
@@ -20,6 +19,7 @@ class Hand(object):
         self.first_hand = first
         if first == None:
             self.first_hand = self
+            self.suit = cur_round.get_suit(self.hand[0])
             self.size_compare = 0
             if len(self.pairs) > 0:
                 self.size_compare = 1
@@ -29,6 +29,7 @@ class Hand(object):
                     break
         else:
             self.size_compare = self.first_hand.size_compare
+            self.suit = suit
 
     def __gt__(self, other_hand):
         """
@@ -47,10 +48,11 @@ class Hand(object):
             if self.round.cmp_cards(self.hand[-1], other_hand.hand[-1]) > 0:
                 return True
         elif self.size_compare == 1:
-            if self.pairs[-1] > other_hand.pairs[-1]:
+            if len(self.pairs) > len(other_hand.pairs) or self.pairs[-1] > other_hand.pairs[-1]:
                 return True
         else:
-            if self.tractors[self.size_compare][-1] > other_hand.tractors[self.size_compare][-1]:
+            if len(self.tractors[self.size_compare]) > other_hand.tractors[self.size_compare] \
+                    or self.tractors[self.size_compare][-1] > other_hand.tractors[self.size_compare][-1]:
                 return True
         return False
 

@@ -23,16 +23,45 @@ class HandTest(unittest.TestCase):
         hand3 = Hand([Card('A', 'clubs'), Card('K', 'clubs')], cur_round)
         hand4 = Hand([Card('A', 'clubs'), Card('A', 'spades')], cur_round)
         hand5 = Hand([Card('A', 'clubs'), Card('A', 'spades'), Card('A', 'spades')], cur_round)
+        hand6 = Hand([Card('8', 'clubs'), Card('8', 'clubs')], cur_round, 'clubs', hand3)
+
         self.assertListEqual(hand1.pairs, [Pair(cur_round, Card('A', 'clubs'))])
         self.assertListEqual(hand2.pairs, [Pair(cur_round, Card('A', 'clubs'))])
         self.assertListEqual(hand3.pairs, [])
         self.assertListEqual(hand4.pairs, [])
         self.assertListEqual(hand5.pairs, [Pair(cur_round, Card('A', 'spades'))])
-        # TODO: test tractor retrieval
+        self.assertListEqual(hand6.pairs, [Pair(cur_round, Card('8', 'clubs'))])
+
+        self.assertEqual(hand1.size_compare, 1)
+        self.assertEqual(hand2.size_compare, 1)
+        self.assertEqual(hand3.size_compare, 0)
+        self.assertEqual(hand4.size_compare, 0)
+        self.assertEqual(hand5.size_compare, 1)
+        self.assertEqual(hand6.size_compare, 0)
+        # TODO: test tractor retrieval, test init with first_hands
         pass
 
     def test_check_is_one_suit(self):
         # TODO: all trumps, all non-trump suit, mixed suits
+        sheng_order = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+        rank_ids = [0, 0, 0, 0]
+
+        zj_id = 0
+        players = [Player("Adam", sheng_order[0]), Player("Andrew", sheng_order[0]),
+                   Player("Alan", sheng_order[0]), Player("Raymond", sheng_order[0])]
+        players[zj_id].set_is_zhuang_jia(True)
+
+        cur_round = Round(players)
+        hand1 = Hand([Card('A', 'clubs'), Card('A', 'clubs')], cur_round)
+        hand2 = Hand([Card('8', 'clubs'), Card('8', 'clubs')], cur_round, 'clubs', hand1)
+        print(hand2.first_hand.suit)
+        hand3 = Hand([Card('J', 'clubs'), Card('3', 'clubs')], cur_round, 'clubs', hand1)
+        hand4 = Hand([Card('5', 'clubs'), Card('10', 'clubs')], cur_round, 'clubs', hand1)
+
+        self.assertTrue(hand1.check_is_one_suit('clubs'))
+        self.assertTrue(hand2.check_is_one_suit('clubs'))
+        self.assertTrue(hand3.check_is_one_suit('clubs'))
+        self.assertTrue(hand4.check_is_one_suit('clubs'))
         pass
 
     def test_pair_lead(self):
