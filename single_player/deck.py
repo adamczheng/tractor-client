@@ -93,6 +93,9 @@ class Deck(object):
     def shuffle(self):
         random.shuffle(self.cards)
 
+    def shuffle_seed(self, seed_function):
+        random.shuffle(self.cards, seed_function)
+
     def pop(self):
         return self.cards.pop()
 
