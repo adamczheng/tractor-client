@@ -65,7 +65,7 @@ class Hand(object):
         return counter
 
     def retrieve_pairs(self):
-        for i in range(len(self.hand)-1):
+        for i in range(len(self.hand) - 1):
             if self.hand[i] == self.hand[i+1]:
                 self.pairs.append(Pair(self.round, self.hand[i]))
 

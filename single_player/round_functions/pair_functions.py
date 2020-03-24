@@ -13,6 +13,9 @@ class Pair(object):
             return True
         return False
 
+    def __eq__(self, other):
+        return self.card_value == other.card_value
+
     def __cmp__(self, other):
         if self.card_value > other.card_value:
             return 1
@@ -20,6 +23,9 @@ class Pair(object):
             return 0
         else:
             return -1
+
+    def __str__(self):
+        return str(self.card)
 
     def get_card(self):
         return self.card
