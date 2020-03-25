@@ -108,7 +108,7 @@ class Round(object):
         choose_di_pai function
         :return: No return value
         """
-        return game_functions.deal(self, True)
+        return game_functions.deal(self)
 
     def liang_query(self, current_drawer):
         #Outdated function
