@@ -16,7 +16,7 @@ class SampleVariable:
         [A♥, A♠, A♠, 4♥, SJo, BJo, BJo, 4♥]
         """
         sv.deal_unrandom(sv.sample_round(), sv.function(0.2))
-        
+
     @staticmethod
     def sample_round():
         sheng_order = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
