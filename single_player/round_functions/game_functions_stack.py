@@ -56,8 +56,8 @@ def play_round(self):
 
     # reveal di pai and add to attacker's points if necessary
     attacker_multiplier = 2 * len(self.cards_played[0])
-    if (self.hand_stack[-1][0] == self.zhuang_jia_id) or \
-            (self.hand_stack[-1][0] == (self.zhuang_jia_id + 2) % 4):
+    if (self.current_player == self.zhuang_jia_id) or \
+            (self.current_player == (self.zhuang_jia_id + 2) % 4):
         attacker_multiplier = 0
 
     di_pai_points = 0
