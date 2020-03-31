@@ -51,7 +51,7 @@ class Hand(object):
             if len(self.pairs) > len(other_hand.pairs) or self.pairs[-1] > other_hand.pairs[-1]:
                 return True
         else:
-            if len(self.tractors[self.size_compare]) > other_hand.tractors[self.size_compare] \
+            if len(self.tractors[self.size_compare]) > len(other_hand.tractors[self.size_compare]) \
                     or self.tractors[self.size_compare][-1] > other_hand.tractors[self.size_compare][-1]:
                 return True
         return False
@@ -99,7 +99,7 @@ class Hand(object):
             current_index = i-1
             while current_index < len(pair_values):
                 is_tractor = True
-                for j in range(current_index, current_index - i, -1):
+                for j in range(current_index, current_index - i + 1, -1):
                     if pair_values[j] != pair_values[j-1] + 1:
                         current_index += 1
                         is_tractor = False
